@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Environment & Secrets
+.env
+
+# Large local caches & downloaded SEC filings
+.cache/
+data/raw_sec/
+*.gguf
+*.bin
+*.safetensors
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: sec-analyst-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sec_analyst}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sec_analyst}
+      POSTGRES_DB: ${POSTGRES_DB:-sec_analyst}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./src/sec_analyst/db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sec_analyst} -d ${POSTGRES_DB:-sec_analyst}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sec-analyst-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env.example
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sec_analyst}:${POSTGRES_PASSWORD:-sec_analyst}@postgres:5432/${POSTGRES_DB:-sec_analyst}
+      DATABASE_READONLY_URL: postgresql://${POSTGRES_USER:-sec_analyst}:${POSTGRES_PASSWORD:-sec_analyst}@postgres:5432/${POSTGRES_DB:-sec_analyst}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://host.docker.internal:8080/v1}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:
