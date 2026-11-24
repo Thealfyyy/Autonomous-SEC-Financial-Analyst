@@ -56,7 +56,7 @@ statuses as the agent triages them. The agent should never rewrite your
 
 ## REQ-1 — Add Project to CV After Final Live Testing — 2026-11-20
 
-**Status:** Queued
+**Status:** Done
 
 **Type:** Change
 
